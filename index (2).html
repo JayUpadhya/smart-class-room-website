@@ -1,0 +1,1573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Next-Gen Smart Classroom | SLIIT Research Project</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050a14;
+    --bg2: #080f1e;
+    --surface: #0d1a2e;
+    --surface2: #112040;
+    --accent: #00d4ff;
+    --accent2: #7b5cfa;
+    --accent3: #00ff9d;
+    --text: #e8f0fe;
+    --text-muted: #7a9cc0;
+    --border: rgba(0,212,255,0.15);
+    --glow: rgba(0,212,255,0.3);
+    --glow2: rgba(123,92,250,0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+   font-family: 'Poppins', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* Noise texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* ========== NAV ========== */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    background: rgba(5,10,20,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+    text-decoration: none;
+  }
+
+  .nav-logo span { color: var(--accent2); }
+
+  .nav-links {
+    display: flex;
+    gap: 0.25rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 0.4rem 0.75rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+
+  .nav-links a:hover {
+    color: var(--accent);
+    background: rgba(0,212,255,0.08);
+  }
+
+  /* ========== HERO ========== */
+  #home {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    padding: 6rem 2rem 4rem;
+  }
+
+  .hero-grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  .hero-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+  }
+
+  .hero-orb-1 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,212,255,0.15), transparent 70%);
+    top: -100px; right: -100px;
+    animation: orbFloat 8s ease-in-out infinite;
+  }
+
+  .hero-orb-2 {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(123,92,250,0.15), transparent 70%);
+    bottom: -50px; left: -100px;
+    animation: orbFloat 10s ease-in-out infinite reverse;
+  }
+
+  .hero-orb-3 {
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(0,255,157,0.1), transparent 70%);
+    top: 50%; left: 50%;
+    animation: orbFloat 6s ease-in-out infinite 2s;
+  }
+
+  @keyframes orbFloat {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-30px) scale(1.05); }
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    text-align: center;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(0,212,255,0.1);
+    border: 1px solid rgba(0,212,255,0.3);
+    border-radius: 100px;
+    padding: 0.4rem 1rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .hero-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent3);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .hero-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.2rem, 5vw, 4rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.8s ease 0.1s both;
+  }
+
+  .hero-title .grad {
+    background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-abstract {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    line-height: 1.8;
+    max-width: 720px;
+    margin: 0 auto 2.5rem;
+    font-weight: 300;
+    animation: fadeUp 0.8s ease 0.2s both;
+  }
+
+  .hero-keywords {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 3rem;
+    animation: fadeUp 0.8s ease 0.3s both;
+  }
+
+  .kw {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    padding: 0.3rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+  }
+
+  .kw:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,212,255,0.05);
+  }
+
+  .hero-modules {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 3rem;
+    animation: fadeUp 0.8s ease 0.4s both;
+  }
+
+  .module-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    text-align: left;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .module-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s;
+  }
+
+  .module-card:hover { border-color: rgba(0,212,255,0.4); transform: translateY(-3px); }
+  .module-card:hover::before { transform: scaleX(1); }
+
+  .module-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+  }
+
+  .module-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    line-height: 1.3;
+    color: var(--text);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ========== SECTIONS ========== */
+  section {
+    padding: 5rem 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .section-label::before {
+    content: '';
+    width: 30px; height: 1px;
+    background: var(--accent);
+  }
+
+  .section-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    letter-spacing: -0.03em;
+    margin-bottom: 1rem;
+    line-height: 1.1;
+  }
+
+  .section-divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+    margin: 5rem 0;
+  }
+
+  /* ========== DOMAIN ========== */
+  .domain-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .tab-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+
+  .tab-btn:hover, .tab-btn.active {
+    background: rgba(0,212,255,0.1);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; animation: fadeUp 0.4s ease; }
+
+  .domain-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    line-height: 1.9;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+
+  .domain-block h3 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--text);
+    margin-bottom: 1rem;
+  }
+
+  .domain-block ul {
+    padding-left: 1.5rem;
+    margin-top: 0.75rem;
+  }
+
+  .domain-block ul li { margin-bottom: 0.5rem; }
+
+  .gap-item {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: rgba(0,212,255,0.04);
+    border-radius: 8px;
+    border-left: 2px solid var(--accent);
+  }
+
+  .gap-item-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .obj-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .obj-card {
+    background: rgba(123,92,250,0.08);
+    border: 1px solid rgba(123,92,250,0.2);
+    border-radius: 10px;
+    padding: 1.25rem;
+  }
+
+  .obj-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent2);
+    opacity: 0.5;
+    margin-bottom: 0.5rem;
+  }
+
+  .obj-text { font-size: 0.88rem; line-height: 1.6; }
+
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .tech-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-align: center;
+    transition: all 0.2s;
+  }
+
+  .tech-chip:hover {
+    border-color: var(--accent3);
+    color: var(--accent3);
+    background: rgba(0,255,157,0.05);
+  }
+
+  .tech-chip .icon { font-size: 1.2rem; display: block; margin-bottom: 0.3rem; }
+
+  /* ========== MILESTONES ========== */
+  .milestone-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .milestone-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 1.5rem;
+    transition: all 0.3s;
+  }
+
+  .milestone-item:hover { border-color: rgba(0,212,255,0.3); }
+
+  .milestone-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+  }
+
+  .milestone-sub {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+  }
+
+  .milestone-date {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .milestone-marks {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 100px;
+    background: rgba(0,212,255,0.1);
+    color: var(--accent);
+    border: 1px solid rgba(0,212,255,0.2);
+    white-space: nowrap;
+  }
+
+  /* ========== DOCUMENTS ========== */
+  .docs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+
+  .doc-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    transition: all 0.3s;
+  }
+
+  .doc-card:hover { border-color: rgba(0,212,255,0.3); transform: translateY(-2px); }
+
+  .doc-icon {
+    font-size: 2rem;
+  }
+
+  .doc-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+
+  .doc-desc {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    flex: 1;
+  }
+
+  .doc-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid rgba(0,212,255,0.3);
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+
+  .doc-link:hover { background: rgba(0,212,255,0.08); }
+
+  .doc-pending {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  /* ========== PRESENTATIONS ========== */
+  .pres-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .pres-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+
+  .pres-card:hover { border-color: rgba(123,92,250,0.4); transform: translateY(-3px); box-shadow: 0 16px 48px rgba(123,92,250,0.15); }
+
+  .pres-thumb {
+    height: 140px;
+    background: linear-gradient(135deg, var(--surface2), #0a1628);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pres-thumb::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0,212,255,0.08), rgba(123,92,250,0.08));
+  }
+
+  .pres-body { padding: 1.25rem; }
+
+  .pres-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent2);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .pres-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .pres-date {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+  }
+
+  .pres-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--accent2);
+    text-decoration: none;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid rgba(123,92,250,0.4);
+    border-radius: 6px;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+
+  .pres-btn:hover { background: rgba(123,92,250,0.1); }
+
+  .pres-pending {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    padding: 0.4rem 0.9rem;
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  /* ========== ABOUT ========== */
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .team-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .team-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transform: scaleX(0);
+    transition: transform 0.3s;
+  }
+
+  .team-card:hover { border-color: rgba(0,212,255,0.3); transform: translateY(-4px); }
+  .team-card:hover::after { transform: scaleX(1); }
+
+  .avatar {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: var(--bg);
+    margin: 0 auto 1rem;
+    box-shadow: 0 0 30px rgba(0,212,255,0.3);
+  }
+
+  .member-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .member-id {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+  }
+
+  .member-email {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    word-break: break-all;
+  }
+
+  .supervisor-card {
+    background: linear-gradient(135deg, rgba(0,212,255,0.06), rgba(123,92,250,0.06));
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 16px;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .supervisor-avatar {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent3), var(--accent));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.6rem;
+    color: var(--bg);
+    flex-shrink: 0;
+    box-shadow: 0 0 30px rgba(0,255,157,0.3);
+  }
+
+  .supervisor-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  .supervisor-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.2rem;
+    margin-bottom: 0.25rem;
+  }
+
+  /* ========== CONTACT ========== */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  @media (max-width: 700px) {
+    .contact-grid { grid-template-columns: 1fr; }
+    nav { padding: 0 1rem; }
+    .nav-links { display: none; }
+    .milestone-item { grid-template-columns: 1fr; }
+  }
+
+  .contact-info {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+  }
+
+  .contact-info h3 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+  }
+
+  .contact-item {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    align-items: flex-start;
+  }
+
+  .contact-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.1rem; }
+
+  .contact-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.2rem;
+  }
+
+  .contact-value {
+    font-size: 0.88rem;
+    color: var(--text);
+  }
+
+  .contact-form { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; }
+  .contact-form h3 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 1.5rem; }
+
+  .form-group { margin-bottom: 1rem; }
+
+  .form-group label {
+    display: block;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+    resize: vertical;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus { border-color: var(--accent); }
+
+  .btn-submit {
+    width: 100%;
+    padding: 0.85rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--bg);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-submit:hover { opacity: 0.9; transform: translateY(-1px); }
+
+  /* ========== FOOTER ========== */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem;
+    text-align: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  footer span { color: var(--accent); }
+
+  /* Section full width wrapper */
+  .section-wrapper {
+    width: 100%;
+    padding: 5rem 2rem;
+  }
+
+  .section-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .alt-bg { background: rgba(255,255,255,0.01); }
+
+  /* Methodology steps */
+  .method-flow {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 1.5rem;
+  }
+
+  .method-step {
+    background: var(--surface);
+    padding: 1.5rem;
+    position: relative;
+  }
+
+  .method-step-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+    opacity: 0.2;
+    margin-bottom: 0.5rem;
+  }
+
+  .method-step-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+  }
+
+  .method-step-desc {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .lit-survey-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .lit-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent2);
+    border-radius: 0 10px 10px 0;
+    padding: 1.25rem;
+  }
+
+  .lit-item h4 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+  }
+
+  .lit-item p { font-size: 0.82rem; color: var(--text-muted); line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#home">NEXT<span>GEN</span>·CLASSROOM</a>
+  <ul class="nav-links">
+    <li><a href="#home">Home</a></li>
+    <li><a href="#domain">Domain</a></li>
+    <li><a href="#milestones">Milestones</a></li>
+    <li><a href="#documents">Documents</a></li>
+    <li><a href="#presentations">Presentations</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO / HOME -->
+<section id="home" style="max-width:100%;padding:0;">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:6rem 2rem 4rem;">
+    <div class="hero-grid-bg"></div>
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+    <div class="hero-orb hero-orb-3"></div>
+    <div class="hero-content">
+      <div class="hero-badge">SLIIT · Faculty of Computing · Research Project 2025</div>
+      <h1 class="hero-title">
+        A <span class="grad">Next-Generation Smart</span><br>Classroom System
+      </h1>
+      <p class="hero-abstract">
+        An integrated AI-powered platform for automated classroom monitoring, voice-based assessment, intelligent video analytics, and automated assignment evaluation  transforming modern educational environments through cutting-edge technology.
+      </p>
+      <div class="hero-keywords">
+        <span class="kw">Smart Classroom</span>
+        <span class="kw">Artificial Intelligence</span>
+        <span class="kw">Computer Vision</span>
+        <span class="kw">Voice Assessment</span>
+        <span class="kw">Deep Learning</span>
+        <span class="kw">OCR</span>
+        <span class="kw">NLP</span>
+        <span class="kw">FastAPI</span>
+        <span class="kw">MongoDB</span>
+        <span class="kw">React</span>
+      </div>
+      <div class="hero-modules">
+        <div class="module-card">
+          <div class="module-num">MODULE 01</div>
+          <div class="module-name">AI-Enabled Classroom Environment Management</div>
+        </div>
+        <div class="module-card">
+          <div class="module-num">MODULE 02</div>
+          <div class="module-name">Conversational Intelligence & Voice Technologies</div>
+        </div>
+        <div class="module-card">
+          <div class="module-num">MODULE 03</div>
+          <div class="module-name">Intelligent Video Analytics & Enhancement</div>
+        </div>
+        <div class="module-card">
+          <div class="module-num">MODULE 04</div>
+          <div class="module-name">Visual Intelligence and Extraction Management</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DOMAIN -->
+<div class="section-wrapper alt-bg" id="domain">
+  <div class="section-inner">
+    <div class="section-label">Domain</div>
+    <h2 class="section-title">Research Domain</h2>
+    <p style="color:var(--text-muted);margin-bottom:2rem;max-width:600px;line-height:1.8;">Explore the research background, problem space, objectives, methodology, and technologies underlying this project.</p>
+
+    <div class="domain-tabs">
+      <button class="tab-btn active" onclick="switchTab('lit')">Literature Survey</button>
+      <button class="tab-btn" onclick="switchTab('gap')">Research Gap</button>
+      <button class="tab-btn" onclick="switchTab('problem')">Research Problem</button>
+      <button class="tab-btn" onclick="switchTab('objectives')">Objectives</button>
+      <button class="tab-btn" onclick="switchTab('methodology')">Methodology</button>
+      <button class="tab-btn" onclick="switchTab('tech')">Technologies</button>
+    </div>
+
+    <!-- Literature Survey -->
+    <div class="tab-content active" id="tab-lit">
+      <div class="domain-block">
+        <h3>Literature Survey</h3>
+        <p style="margin-bottom:1.5rem;">A comprehensive review of existing work across four core research areas underpins the design of this system:</p>
+        <div class="lit-survey-grid">
+          <div class="lit-item">
+            <h4>🎯 AI-Based Exam Monitoring</h4>
+            <p>Automated proctoring systems using facial recognition and behavioral analysis have been widely studied. Multimodal approaches combining video and audio improve detection accuracy, though privacy and algorithmic bias remain challenges requiring ethical system design.</p>
+          </div>
+          <div class="lit-item">
+            <h4>🗣️ Speech Recognition & Voice Assessment</h4>
+            <p>Deep learning has enabled real-time accurate speech transcription. Transformer-based models improve robustness. Systems such as Whisper demonstrate high accuracy via large-scale weak supervision. Voice-based assessments reduce test anxiety and support interactive evaluation.</p>
+          </div>
+          <div class="lit-item">
+            <h4>🎥 Intelligent Video Analytics</h4>
+            <p>Recorded lectures often contain irrelevant content that reduces learning effectiveness. Intelligent video analytics can automatically remove such segments. Speech-to-text technologies and AI-based summarization generate concise, accessible learning materials.</p>
+          </div>
+          <div class="lit-item">
+            <h4>📊 Automated Assignment Evaluation</h4>
+            <p>Growing student numbers demand efficient evaluation methods. Research spans structural similarity for code grading, ER diagram assessment systems, and UML modeling error detection. Integrating learning analytics supports personalized feedback and adaptive learning.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Research Gap -->
+    <div class="tab-content" id="tab-gap">
+      <div class="domain-block">
+        <h3>Research Gap</h3>
+        <p style="margin-bottom:1.5rem;">While numerous smart classroom solutions exist, significant gaps remain in the current landscape:</p>
+        <div class="gap-item">
+          <div class="gap-item-icon">🔗</div>
+          <div>
+            <strong style="color:var(--text);">Fragmented, Isolated Tools</strong>
+            <p style="margin-top:0.3rem;">Many existing smart classroom solutions address only a limited set of functionalities  such as online examination platforms, lecture recording systems, or assignment submission portals  operating as isolated tools rather than integrated learning ecosystems.</p>
+          </div>
+        </div>
+        <div class="gap-item">
+          <div class="gap-item-icon">🤖</div>
+          <div>
+            <strong style="color:var(--text);">Lack of Comprehensive AI Integration</strong>
+            <p style="margin-top:0.3rem;">Existing systems fail to simultaneously support monitoring, assessment, content management, and intelligent feedback generation within a single unified platform for both instructors and students.</p>
+          </div>
+        </div>
+        <div class="gap-item">
+          <div class="gap-item-icon">🎙️</div>
+          <div>
+            <strong style="color:var(--text);">Limited Voice-Based Assessment</strong>
+            <p style="margin-top:0.3rem;">Traditional written examinations do not always effectively measure student understanding in scenarios requiring verbal communication and conceptual explanation. Voice-based evaluation remains underexplored in smart classroom contexts.</p>
+          </div>
+        </div>
+        <div class="gap-item">
+          <div class="gap-item-icon">📐</div>
+          <div>
+            <strong style="color:var(--text);">Diagram-Based Assignment Evaluation</strong>
+            <p style="margin-top:0.3rem;">Automated evaluation of diagram-based tasks such as ER diagrams and flowcharts remains a challenging, underserved area, often requiring time-consuming manual grading that introduces subjectivity and inconsistency.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Research Problem -->
+    <div class="tab-content" id="tab-problem">
+      <div class="domain-block">
+        <h3>Research Problem</h3>
+        <p style="margin-bottom:1.5rem;font-size:1.05rem;line-height:1.9;">Traditional classroom environments rely heavily on <strong style="color:var(--text);">manual supervision, delayed assessment feedback, and static learning materials</strong>, which limit the overall effectiveness of the teaching and learning process.</p>
+        <p style="margin-bottom:1.5rem;">In many educational institutions, instructors must manage large numbers of students while simultaneously conducting assessments, monitoring academic integrity, and providing feedback  responsibilities that are time-consuming and may lead to inconsistencies in evaluation and supervision.</p>
+        <p style="margin-bottom:1.5rem;">With the rapid growth of digital and hybrid learning environments, there is an increasing demand for smart classroom solutions capable of:</p>
+        <ul>
+          <li>Improving classroom management efficiency</li>
+          <li>Enhancing assessment accuracy and speed</li>
+          <li>Supporting interactive and personalized learning experiences</li>
+          <li>Providing real-time feedback to both students and instructors</li>
+          <li>Maintaining academic integrity in remote examination settings</li>
+        </ul>
+        <div style="margin-top:1.5rem;padding:1.25rem;background:rgba(0,212,255,0.05);border-radius:10px;border:1px solid rgba(0,212,255,0.15);">
+          <p style="font-style:italic;color:var(--text);line-height:1.8;"><strong style="color:var(--accent);">Core Problem:</strong> How can a unified, intelligent platform be designed that simultaneously addresses classroom monitoring, automated assessment, lecture content enhancement, and personalized feedback generation to create a comprehensive smart classroom ecosystem?</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Objectives -->
+    <div class="tab-content" id="tab-objectives">
+      <div class="domain-block">
+        <h3>Research Objectives</h3>
+        <p style="margin-bottom:1.5rem;">The proposed system targets the following key research objectives:</p>
+        <div class="obj-grid">
+          <div class="obj-card">
+            <div class="obj-num">01</div>
+            <p class="obj-text">Develop an AI-enabled classroom monitoring system that uses facial recognition and behavioral analysis to ensure academic integrity during examinations in real time.</p>
+          </div>
+          <div class="obj-card">
+            <div class="obj-num">02</div>
+            <p class="obj-text">Design and implement a voice-based assessment module that automatically generates questions, captures verbal responses, evaluates answer accuracy, and analyzes speech confidence.</p>
+          </div>
+          <div class="obj-card">
+            <div class="obj-num">03</div>
+            <p class="obj-text">Build an intelligent video analytics system that processes recorded lectures by removing irrelevant segments and generating structured transcripts and AI-based summaries.</p>
+          </div>
+          <div class="obj-card">
+            <div class="obj-num">04</div>
+            <p class="obj-text">Create an automated assignment evaluation module capable of grading both multiple-choice and diagram-based assignments using deep learning, OCR, and visual analytics.</p>
+          </div>
+          <div class="obj-card">
+            <div class="obj-num">05</div>
+            <p class="obj-text">Integrate all four modules into a unified, scalable platform that enables seamless data flow between components and supports data-driven educational decision-making.</p>
+          </div>
+          <div class="obj-card">
+            <div class="obj-num">06</div>
+            <p class="obj-text">Evaluate the effectiveness, accuracy, and efficiency of each module through simulated classroom scenarios and experimental validation.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Methodology -->
+    <div class="tab-content" id="tab-methodology">
+      <div class="domain-block">
+        <h3>Methodology</h3>
+        <p style="margin-bottom:1rem;">The system follows a layered, modular architecture designed for scalability and interoperability. Each module was developed and tested independently before being integrated into a unified smart classroom ecosystem.</p>
+        <!-- SYSTEM OVERVIEW DIAGRAM -->
+<div class="diagram-container">
+  <img src="images/system-diagram.png" alt="System Overview Diagram" class="diagram-img">
+  <p class="diagram-caption">Figure 1: System Overview Diagram</p>
+</div>
+        <div class="method-flow">
+          <div class="method-step">
+            <div class="method-step-num">01</div>
+            <div class="method-step-title">Data Acquisition Layer</div>
+            <div class="method-step-desc">Collects real-time information from cameras, microphones, and user interfaces including video streams, audio recordings, and digital learning materials.</div>
+          </div>
+          <div class="method-step">
+            <div class="method-step-num">02</div>
+            <div class="method-step-title">Processing Layer</div>
+            <div class="method-step-desc">Applies AI-driven algorithms  computer vision, NLP, speech recognition, and machine learning to analyze visual, audio, and textual data from all input sources.</div>
+          </div>
+          <div class="method-step">
+            <div class="method-step-num">03</div>
+            <div class="method-step-title">Application Layer</div>
+            <div class="method-step-desc">Presents processed results through interactive interfaces for students and instructors, enabling monitoring, automated assessment, content enhancement, and evaluation.</div>
+          </div>
+        </div>
+        <div style="margin-top:1.5rem;">
+          <p><strong style="color:var(--text);">Module Integration:</strong> The integrated framework enables seamless communication between system components. Audio from voice assessments supports both evaluation and transcription; video data supports both monitoring and lecture enhancement. This modular yet interconnected design improves system scalability, maintainability, and efficiency.</p>
+        </div>
+        <div style="margin-top:1rem;padding:1rem;background:rgba(0,255,157,0.04);border-radius:8px;border:1px solid rgba(0,255,157,0.15);">
+          <p style="font-size:0.85rem;color:var(--text-muted);"><strong style="color:var(--accent3);">Architecture:</strong> Frontend (React.js/Vite) → FastAPI Backend → MongoDB Storage → AI Services (ML Processing, Video Data, Assignment Results) → Unified Output Layer (Warnings, Transcripts, Grades, Feedback Reports)</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Technologies -->
+    <div class="tab-content" id="tab-tech">
+      <div class="domain-block">
+        <h3>Technologies Used</h3>
+        <p style="margin-bottom:1.5rem;">The system integrates a diverse stack of AI models, modern web technologies, and backend processing frameworks:</p>
+        <div style="margin-bottom:1.25rem;">
+          <div style="font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.75rem;">Frontend</div>
+          <div class="tech-grid">
+            <div class="tech-chip"><span class="icon">⚛️</span>React.js</div>
+            <div class="tech-chip"><span class="icon">⚡</span>Vite</div>
+            <div class="tech-chip"><span class="icon">🎨</span>CSS3</div>
+            <div class="tech-chip"><span class="icon">🗣️</span>Web Speech API</div>
+          </div>
+        </div>
+        <div style="margin-bottom:1.25rem;">
+          <div style="font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.75rem;">Backend & Database</div>
+          <div class="tech-grid">
+            <div class="tech-chip"><span class="icon">🚀</span>FastAPI</div>
+            <div class="tech-chip"><span class="icon">🐍</span>Python</div>
+            <div class="tech-chip"><span class="icon">🍃</span>MongoDB</div>
+            <div class="tech-chip"><span class="icon">🔌</span>REST API</div>
+            <div class="tech-chip"><span class="icon">🔄</span>WebSocket</div>
+          </div>
+        </div>
+        <div style="margin-bottom:1.25rem;">
+          <div style="font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.75rem;">AI & Machine Learning</div>
+          <div class="tech-grid">
+            <div class="tech-chip"><span class="icon">👁️</span>MediaPipe</div>
+            <div class="tech-chip"><span class="icon">🧠</span>MTCNN</div>
+            <div class="tech-chip"><span class="icon">🌊</span>OpenCV</div>
+            <div class="tech-chip"><span class="icon">🎙️</span>Whisper (ASR)</div>
+            <div class="tech-chip"><span class="icon">🤖</span>Google Gemini</div>
+            <div class="tech-chip"><span class="icon">🌲</span>Random Forest</div>
+            <div class="tech-chip"><span class="icon">🖼️</span>VGG16</div>
+            <div class="tech-chip"><span class="icon">📝</span>OCR</div>
+            <div class="tech-chip"><span class="icon">🔤</span>NLP</div>
+            <div class="tech-chip"><span class="icon">📊</span>Deep Learning</div>
+            <div class="tech-chip"><span class="icon">🔍</span>TensorFlow</div>
+            <div class="tech-chip"><span class="icon">🎯</span>Scikit-learn</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MILESTONES -->
+<div class="section-wrapper" id="milestones">
+  <div class="section-inner">
+    <div class="section-label">Milestones</div>
+    <h2 class="section-title">Project Milestones</h2>
+    <p style="color:var(--text-muted);margin-bottom:2rem;line-height:1.8;">All project assessments, submission dates, and marks allocation for the 2025 research cycle.</p>
+
+    <div class="milestone-grid">
+      <div class="milestone-item">
+        <div>
+          <div class="milestone-name">Project Proposal</div>
+          <div class="milestone-sub">Initial project proposal document and presentation</div>
+        </div>
+        <div class="milestone-date">2025 · Semester 1</div>
+        <div class="milestone-marks">Completed ✓</div>
+      </div>
+      <div class="milestone-item">
+        <div>
+          <div class="milestone-name">Progress Presentation 1 (PP1)</div>
+          <div class="milestone-sub">First progress review - literature survey, system design & initial implementation</div>
+        </div>
+        <div class="milestone-date">2025 · Semester 1</div>
+        <div class="milestone-marks">Completed ✓</div>
+      </div>
+      <div class="milestone-item">
+        <div>
+          <div class="milestone-name">Progress Presentation 2 (PP2)</div>
+          <div class="milestone-sub">Second progress review - system implementation and evaluation results</div>
+        </div>
+        <div class="milestone-date">2026 · Semester 2</div>
+        <div class="milestone-marks">Completed ✓</div>
+      </div>
+      <div class="milestone-item">
+        <div>
+          <div class="milestone-name">Research Paper Submission</div>
+          <div class="milestone-sub">Formal research paper documenting system architecture, methodology and results</div>
+        </div>
+        <div class="milestone-date">2026 · Semester 2</div>
+        <div class="milestone-marks">Submitted ✓</div>
+      </div>
+      <div class="milestone-item">
+        <div>
+          <div class="milestone-name">Final Assessment</div>
+          <div class="milestone-sub">Complete system demonstration, final report submission</div>
+        </div>
+        <div class="milestone-date">2026 · Semester 2</div>
+        <div class="milestone-marks">Upcoming</div>
+      </div>
+      <div class="milestone-item">
+        <div>
+          <div class="milestone-name">Final Viva </div>
+          <div class="milestone-sub">Individual oral examination on research contribution</div>
+        </div>
+        <div class="milestone-date">2026 · Semester 2</div>
+        <div class="milestone-marks">Upcoming</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DOCUMENTS -->
+<div class="section-wrapper alt-bg" id="documents">
+  <div class="section-inner">
+    <div class="section-label">Documents</div>
+    <h2 class="section-title">Project Documents</h2>
+    <p style="color:var(--text-muted);margin-bottom:2rem;line-height:1.8;">All project documentation — Research Project.</p>
+
+    <div class="docs-grid">
+      <div class="doc-card">
+        <div class="doc-icon">📋</div>
+        <div class="doc-name">Project Charter</div>
+        <div class="doc-desc">Formal authorization document outlining project scope, objectives, and stakeholder responsibilities.</div>
+        <a href="https://teams.cloud.microsoft/" target="_blank" class="pres-btn">↗ View on CDAP</a>
+      </div>
+      <div class="doc-card">
+        <div class="doc-icon">📄</div>
+        <div class="doc-name">Proposal Document</div>
+        <div class="doc-desc">Comprehensive research proposal including literature review, problem statement, and proposed methodology.</div>
+        <a href="https://mysliit.sharepoint.com/sites/CDAPSubmissionCloud/2526JCloud/Forms/AllItems.aspx?id=%2Fsites%2FCDAPSubmissionCloud%2F2526JCloud%2F25%2D26J%2D322%2DStudents%2F1%2E%20Project%20Proposal%2FIndividual%20Reports&viewid=b6c5e95e%2Dd054%2D4e72%2Dbb46%2D33a9940141f2" target="_blank" class="pres-btn">↗ View on CDAP</a>
+      </div>
+      <div class="doc-card">
+        <div class="doc-icon">✅</div>
+        <div class="doc-name">Check List 1</div>
+        <div class="doc-desc">Assessment checklists and progress tracking documents submitted at each milestone.</div>
+        <a href="https://github.com/HiruUltra/NGLSC/blob/main/README.md" target="_blank" class="pres-btn">↗ View on GitHub</a>
+      </div>
+       <div class="doc-card">
+        <div class="doc-icon">✅</div>
+        <div class="doc-name">Check List 2</div>
+        <div class="doc-desc">Assessment checklists and progress tracking documents submitted at each milestone.</div>
+    <a href="https://teams.cloud.microsoft/" target="_blank" class="pres-btn">↗ View on Microsoft Teams</a>
+      </div>
+       <div class="doc-card">
+        <div class="doc-icon">📚</div>
+        <div class="doc-name">Final Group Report</div>
+        <div class="doc-desc">Comprehensive report summarizing the entire project's findings and contributions.</div>
+         <a href="https://mysliit.sharepoint.com/sites/CDAPSubmissionCloud/2526JCloud/Forms/AllItems.aspx?id=%2Fsites%2FCDAPSubmissionCloud%2F2526JCloud%2F25%2D26J%2D322%2DStudents%2F5%2E%20Final%20Report%20%26%20Presentation%2FFinal%20Reports&viewid=b6c5e95e%2Dd054%2D4e72%2Dbb46%2D33a9940141f2" target="_blank" class="pres-btn">↗ View on CDAP</a>
+      </div>
+      <div class="doc-card">
+        <div class="doc-icon">📚</div>
+        <div class="doc-name">Final Individual Document - Member 1</div>
+        <div class="doc-desc">Individual component report by Dilhara W.P.H - AI-Enabled Classroom Monitoring.</div>
+         <a href="https://mysliit.sharepoint.com/sites/CDAPSubmissionCloud/2526JCloud/Forms/AllItems.aspx?id=%2Fsites%2FCDAPSubmissionCloud%2F2526JCloud%2F25%2D26J%2D322%2DStudents%2F5%2E%20Final%20Report%20%26%20Presentation%2FFinal%20Reports&viewid=b6c5e95e%2Dd054%2D4e72%2Dbb46%2D33a9940141f2" target="_blank" class="pres-btn">↗ View on CDAP</a>
+      </div>
+      <div class="doc-card">
+        <div class="doc-icon">📚</div>
+        <div class="doc-name">Final Individual Document - Member 2</div>
+        <div class="doc-desc">Individual component report by Silva L.J.U - Conversational Intelligence & Voice Technologies.</div>
+         <a href="https://mysliit.sharepoint.com/sites/CDAPSubmissionCloud/2526JCloud/Forms/AllItems.aspx?id=%2Fsites%2FCDAPSubmissionCloud%2F2526JCloud%2F25%2D26J%2D322%2DStudents%2F5%2E%20Final%20Report%20%26%20Presentation%2FFinal%20Reports&viewid=b6c5e95e%2Dd054%2D4e72%2Dbb46%2D33a9940141f2" target="_blank" class="pres-btn">↗ View on CDAP</a >
+      </div>
+      <div class="doc-card">
+        <div class="doc-icon">📚</div>
+        <div class="doc-name">Final Individual  Document - Member 3</div>
+        <div class="doc-desc">Individual component report by Mihiran T.A - Intelligent Video Analytics & Enhancement.</div>
+         <a href="https://mysliit.sharepoint.com/sites/CDAPSubmissionCloud/2526JCloud/Forms/AllItems.aspx?id=%2Fsites%2FCDAPSubmissionCloud%2F2526JCloud%2F25%2D26J%2D322%2DStudents%2F5%2E%20Final%20Report%20%26%20Presentation%2FFinal%20Reports&viewid=b6c5e95e%2Dd054%2D4e72%2Dbb46%2D33a9940141f2" target="_blank" class="pres-btn">↗ View on CDAP</a>
+      </div>
+      <div class="doc-card">
+        <div class="doc-icon">📚</div>
+        <div class="doc-name">Final Individual Document - Member 4</div>
+        <div class="doc-desc">Individual component report by De Silva L.S - Visual Intelligence and Extraction Management.</div>
+         <a href="https://mysliit.sharepoint.com/sites/CDAPSubmissionCloud/2526JCloud/Forms/AllItems.aspx?id=%2Fsites%2FCDAPSubmissionCloud%2F2526JCloud%2F25%2D26J%2D322%2DStudents%２F5%２E%２0Final%２0Report%２0％２０Presentation％２FFinal％２０Reports％２Fviewid％２Db6c5e95e％２Dd054％２D4e7₂％２Dbb46％２D33a9940141f₂" target="_blank" class="pres-btn">↗ View on CDAP</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRESENTATIONS -->
+<div class="section-wrapper" id="presentations">
+  <div class="section-inner">
+    <div class="section-label">Presentations</div>
+    <h2 class="section-title">Presentation Slides</h2>
+    <p style="color:var(--text-muted);margin-bottom:2rem;line-height:1.8;">Slides from all project presentations. Future presentations will be added upon completion.</p>
+
+    <div class="pres-grid">
+      <div class="pres-card">
+        <div class="pres-thumb">📊</div>
+        <div class="pres-body">
+          <div class="pres-label">Proposal</div>
+          <div class="pres-name">Project Proposal Presentation</div>
+          <div class="pres-date">Semester 1 · 2025</div>
+          <a href="https://www.canva.com/design/DAHH1cBvyuM/oH3f7ZPxJNSSQyWx8PK8jA/edit?ui=e30" target="_blank" class="pres-btn">↗ View on Canva</a>
+        </div>
+      </div>
+      <div class="pres-card">
+        <div class="pres-thumb">📈</div>
+        <div class="pres-body">
+          <div class="pres-label">Progress 1</div>
+          <div class="pres-name">Progress Presentation 1</div>
+          <div class="pres-date">Semester 1 · 2025</div>
+          <a href="https://www.canva.com/design/DAHH1HgKrUU/gKtFfiTk-E5HVGHGO_cjMg/edit" target="_blank" class="pres-btn">↗ View on Canva</a>
+        </div>
+      </div>
+      <div class="pres-card">
+        <div class="pres-thumb">🚀</div>
+        <div class="pres-body">
+          <div class="pres-label">Progress 2</div>
+          <div class="pres-name">Progress Presentation 2</div>
+          <div class="pres-date">Semester 2 · 2025</div>
+          <a href="https://www.canva.com/design/DAGxumJRzmY/digaMxfcwITl4RsI1QGgvw/edit" target="_blank" class="pres-btn">↗ View on Canva</a>
+        </div>
+      </div>
+      <div class="pres-card">
+        <div class="pres-thumb">🏆</div>
+        <div class="pres-body">
+          <div class="pres-label">Final</div>
+          <div class="pres-name">Final Presentation</div>
+          <div class="pres-date">Semester 2 · 2025</div>
+         <a href="https://www.canva.com/design/DAHH072lYIE/x-hRK1D3ROzOUvlSXbxA6A/edit" target="_blank" class="pres-btn">↗ View on Canva</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div class="section-wrapper alt-bg" id="about">
+  <div class="section-inner">
+    <div class="section-label">About Us</div>
+    <h2 class="section-title">The Team</h2>
+    <p style="color:var(--text-muted);margin-bottom:2.5rem;line-height:1.8;">Final year undergraduate researchers from the Faculty of Computing, Sri Lanka Institute of Information Technology.</p>
+
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="avatar">DW</div>
+        <div class="member-name">Dilhara W.P.H</div>
+        <div class="member-id">IT22567406</div>
+        <div class="member-email">it22567406@my.sliit.lk</div>
+      </div>
+      <div class="team-card">
+        <div class="avatar">SL</div>
+        <div class="member-name">Silva L.J.U</div>
+        <div class="member-id">IT22229816</div>
+        <div class="member-email">it22229816@my.sliit.lk</div>
+      </div>
+      <div class="team-card">
+        <div class="avatar">MT</div>
+        <div class="member-name">Mihiran T.A</div>
+        <div class="member-id">IT22223630</div>
+        <div class="member-email">it22223630@my.sliit.lk</div>
+      </div>
+      <div class="team-card">
+        <div class="avatar">DS</div>
+        <div class="member-name">De Silva L.S</div>
+        <div class="member-id">IT22211132</div>
+        <div class="member-email">it22211132@my.sliit.lk</div>
+      </div>
+    </div>
+
+    <div class="supervisor-card">
+      <div class="supervisor-avatar">SK</div>
+      <div>
+        <div class="supervisor-label">Project Supervisor</div>
+        <div class="supervisor-name">Sanvitha Kasthuriarachchi</div>
+        <div style="color:var(--text-muted);font-size:0.88rem;margin-top:0.25rem;">Faculty of Computing · SLIIT, Malabe</div>
+       
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<div class="section-wrapper" id="contact">
+  <div class="section-inner">
+    <div class="section-label">Contact</div>
+    <h2 class="section-title">Get in Touch</h2>
+    <p style="color:var(--text-muted);margin-bottom:2.5rem;line-height:1.8;">Have questions about our research? Reach out to the team.</p>
+
+    <div class="contact-grid">
+      <div class="contact-info">
+        <h3>Contact Information</h3>
+        <div class="contact-item">
+          <div class="contact-icon">🏛️</div>
+          <div>
+            <div class="contact-label">Institution</div>
+            <div class="contact-value">Sri Lanka Institute of Information Technology (SLIIT)</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📍</div>
+          <div>
+            <div class="contact-label">Location</div>
+            <div class="contact-value">New Kandy Road, Malabe, Sri Lanka</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">🎓</div>
+          <div>
+            <div class="contact-label">Faculty</div>
+            <div class="contact-value">Faculty of Computing</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📧</div>
+          <div>
+            <div class="contact-label">Team Leader's Phone Number</div>
+             <div class="contact-value">074 1836914</div>
+            
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📧</div>
+          <div>
+            <div class="contact-label">Team Leader's Email</div>
+            <div class="contact-value">it22567406@my.sliit.lk</div>
+          
+          </div>
+        </div>
+       
+      </div>
+
+      <div class="contact-form">
+        <h3>Send a Message</h3>
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" placeholder="Your full name">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" placeholder="your@email.com">
+        </div>
+        <div class="form-group">
+          <label>Subject</label>
+          <input type="text" placeholder="Research inquiry...">
+        </div>
+        <div class="form-group">
+          <label>Message</label>
+          <textarea rows="4" placeholder="Your message here..."></textarea>
+        </div>
+        <button class="btn-submit">SEND MESSAGE →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>© 2025 Next-Gen Smart Classroom Research Group · <span>SLIIT Faculty of Computing</span> · All Rights Reserved</p>
+  <p style="margin-top:0.5rem;opacity:0.5;">Built with HTML · CSS · JavaScript &nbsp;|&nbsp; Technology: WordPress / HTML / CSS Compliant</p>
+</footer>
+
+<script>
+  function switchTab(tabId) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById('tab-' + tabId).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  // Smooth nav highlight on scroll
+  const sections = document.querySelectorAll('[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(section => {
+      if (window.scrollY >= section.offsetTop - 80) current = section.id;
+    });
+    navLinks.forEach(link => {
+      link.style.color = link.getAttribute('href') === '#' + current ? 'var(--accent)' : '';
+    });
+  });
+
+  // Submit button interaction
+  document.querySelector('.btn-submit').addEventListener('click', function() {
+    this.textContent = 'MESSAGE SENT ✓';
+    this.style.background = 'linear-gradient(135deg, var(--accent3), #00cc7a)';
+    setTimeout(() => {
+      this.textContent = 'SEND MESSAGE →';
+      this.style.background = '';
+    }, 3000);
+  });
+</script>
+</body>
+</html>
